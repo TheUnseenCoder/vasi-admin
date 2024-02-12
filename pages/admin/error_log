@@ -1,0 +1,82 @@
+[16-Nov-2023 05:40:50 UTC] PHP Warning:  include($logo_default): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/admin/components/navigation.php on line 11
+[16-Nov-2023 05:40:50 UTC] PHP Warning:  include(): Failed opening '$logo_default' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/admin/components/navigation.php on line 11
+[16-Nov-2023 05:40:51 UTC] PHP Warning:  include($logo_default): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/admin/components/navigation.php on line 11
+[16-Nov-2023 05:40:51 UTC] PHP Warning:  include(): Failed opening '$logo_default' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/admin/components/navigation.php on line 11
+[11-Dec-2023 12:13:19 UTC] PHP Warning:  Undefined array key "stocks" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 92
+[11-Dec-2023 12:42:06 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 135
+[11-Dec-2023 12:42:41 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 131
+[11-Dec-2023 12:42:52 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 131
+[11-Dec-2023 12:44:09 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 137
+[11-Dec-2023 12:44:54 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 137
+[11-Dec-2023 12:46:17 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 138
+[11-Dec-2023 12:46:59 UTC] PHP Warning:  Undefined variable $id in /home/nuqkqixl/public_html/ims/pages/admin/product.php on line 137
+[11-Dec-2023 13:09:00 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/nuqkqixl/public_html/ims/pages/admin/dashboard.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/nuqkqixl/public_html/ims/pages/admin/dashboard.php on line 43
+[11-Dec-2023 13:09:02 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/nuqkqixl/public_html/ims/pages/admin/dashboard.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/nuqkqixl/public_html/ims/pages/admin/dashboard.php on line 43
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:28:09 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:28:35 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:28:48 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:29:44 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:30:31 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:30:46 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:30:55 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined array key "product_id" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 141
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined array key "product_name" in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 145
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined variable $product_description in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 146
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 158
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 161
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 162
+[11-Dec-2023 13:32:11 UTC] PHP Warning:  Undefined variable $ims_status in /home/nuqkqixl/public_html/ims/pages/admin/stocks.php on line 163
+[12-Dec-2023 07:19:45 UTC] PHP Warning:  include(../../../conn.php): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3
+[12-Dec-2023 07:19:45 UTC] PHP Warning:  include(): Failed opening '../../../conn.php' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3
+[12-Dec-2023 07:19:49 UTC] PHP Warning:  include(../../../conn.php): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3
+[12-Dec-2023 07:19:49 UTC] PHP Warning:  include(): Failed opening '../../../conn.php' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3
+[12-Dec-2023 07:19:50 UTC] PHP Warning:  include(../../../conn.php): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3
+[12-Dec-2023 07:19:50 UTC] PHP Warning:  include(): Failed opening '../../../conn.php' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/ims/pages/admin/get_product_details.php on line 3

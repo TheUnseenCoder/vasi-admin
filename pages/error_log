@@ -1,0 +1,2 @@
+[15-Nov-2023 04:40:24 UTC] PHP Warning:  include(logo_display.php): Failed to open stream: No such file or directory in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/index.php on line 61
+[15-Nov-2023 04:40:24 UTC] PHP Warning:  include(): Failed opening 'logo_display.php' for inclusion (include_path='.:/opt/alt/php80/usr/share/pear:/opt/alt/php80/usr/share/php:/usr/share/pear:/usr/share/php') in /home/nuqkqixl/public_html/inventorymanagementsystem/pages/index.php on line 61
