@@ -74,7 +74,6 @@ elseif (isset($_POST["update_supplier"])) {
         header('Location: ../supplier.php');
     }
 }
-
 elseif (isset($_POST["update_record"])) {
      $id = $_POST['id'];
      $requested_by = $_POST['requested_by'];
@@ -84,25 +83,11 @@ elseif (isset($_POST["update_record"])) {
      $returned_cash = $_POST['returned_cash'];
      $category_name = $_POST['category_name'];
      $category_amount = $_POST['category_amount'];
+     $old_category_name = $_POST['old_category'];
  
-     $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', $category_name = '$category_amount' WHERE record_id = '$id'";
- 
+     $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', $category_name = '$category_amount', $old_category_name = 0 WHERE record_id = '$id'"; 
      if (mysqli_query($conn, $sql)) {
-         $query = "SELECT category_name FROM admin_categories";
-         $result = mysqli_query($conn, $query);
- 
-         if (mysqli_num_rows($result) > 0) {
-             while ($row = mysqli_fetch_assoc($result)) {
-                 $category_names = $row['category_name'];
-                 $category_name_replace = strtolower(str_replace([' - ', ', ', ' / ', '-', ',','/',' '], '_', $category_names));
-                 $value = $_POST[$category_name_replace];
-                 $category_sql = "UPDATE admin_records SET $category_name_replace = '0' WHERE record_id = '$id' AND $category_names != '$category_name'";
-                 mysqli_query($conn, $category_sql);
-             }
-         }else{
-             echo "Error adding column: " . $conn->error;
-         }
-         header("Location: ../recents.php");
+        header("Location: ../recents.php");
      } else {
          echo "Error adding column: " . $conn->error;
      }
@@ -143,7 +128,6 @@ elseif (isset($_POST["update_account"])) {
     if ($new_image_path != $old_profile_picture) {
         $changed_fields['profile'] = $new_image_path;
     }
-
    if (!empty($changed_fields)) {
         $sql = "UPDATE admin_login SET ";
         $types = '';
@@ -168,7 +152,6 @@ elseif (isset($_POST["update_design"])) {
     $title = trim($_POST['title']);
     $old_title = trim($_POST['old_title']);
     $old_logo_default = str_replace('functions/', '', $_POST['old_logo_default']);
-
 
     $uploadDirectory = 'uploads/';
     if (!file_exists($uploadDirectory)) {

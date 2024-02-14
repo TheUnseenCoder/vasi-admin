@@ -190,12 +190,4 @@ elseif (isset($_POST["add_stocks"])) {
     }
 }
 
-
-
-
-
-
-
-
-
 ?>

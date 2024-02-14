@@ -86,22 +86,36 @@ if (isset($_SESSION["loggedinasadmin"]) && $_SESSION["loggedinasadmin"] == true)
         // Check username and password (replace these with your actual authentication logic)
         $input_username = $_POST["username"];
         $input_password = md5($_POST["password"]); // Hash the entered password
-
+        $status = "enabled";
         // Perform a query to find the user with the given username
-        $sql = "SELECT username, password FROM admin_login WHERE privilege = 'Administrator' AND username = '$input_username'";
+        $sql = "SELECT username, password, full_name, privilege FROM admin_login WHERE username = '$input_username' AND status = '$status'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
          $row = $result->fetch_assoc();
          $username = $row['username'];
          $password = $row['password'];
+         $fullname = $row['full_name'];
+         $privilege = $row['privilege'];
 
          // Verify the entered password against the hashed password in the database
          if ($input_password == $password) {
           // Successful login, redirect to a secure page
-          $_SESSION["loggedinasadmin"] = true;
-          header("Location: admin/dashboard.php");
-          exit();
+
+          if($privilege == "Administrator"){
+            $_SESSION["privilege"] = $privilege;
+            $_SESSION["fullname"] = $fullname;
+            $_SESSION["loggedinasadmin"] = true;
+            header("Location: admin/dashboard.php");
+            exit();
+          }
+          elseif($privilege == "Main User"){
+            $_SESSION["privilege"] = $privilege;
+            $_SESSION["fullname"] = $fullname;
+            $_SESSION["loggedinasmainuser"] = true;
+            header("Location: admin/dashboard.php");
+            exit();
+          }
          }
         }
 

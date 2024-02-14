@@ -4,10 +4,7 @@ session_start();
 
 include '../../conn.php';
 
-if(!isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] !== true){
-    header("location: ../../index.php");
-    exit;
-}
+if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
 
 ?>
 <!DOCTYPE html>
@@ -107,7 +104,7 @@ if(!isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] !== true
                     </td>
                     <?php
                             }
-                            }
+                                }
                           ?>
                   </tr>      
                 </tbody>
@@ -391,6 +388,21 @@ document.addEventListener("DOMContentLoaded", function() {
               //     echo 'No categories found.';
               // }
               ?>
+
+                      <?php
+                        $sql_category1 = "SELECT * FROM admin_categories";
+                        $result_category1 = mysqli_query($conn, $sql_category1);
+                        while ($category_row1 = mysqli_fetch_assoc($result_category1)) {
+                            $category_name = $category_row1['category_name'];
+                            $category_name_replace = strtolower(str_replace([' - ', ', ', ' / ', '-', ',','/',' '], '_', $category_name));         
+                            $sql_records = "SELECT $category_name_replace FROM admin_records WHERE record_id = '$id' AND $category_name_replace != 0";
+                            $result_records = mysqli_query($conn, $sql_records);
+                            if ($row_records = mysqli_fetch_assoc($result_records)) {
+                                $category_value = $row_records[$category_name_replace];
+                                echo "<input type='text' name='old_category' class='form-control' id='category_amount' value='$category_name_replace' required hidden>";
+                            }
+                        }
+                      ?>    
               <div class="row mb-2">
                 <div class="col-md-6">
                     <label for="categorySelect">Category:</label>
@@ -499,3 +511,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </body>
 </html>
+<?php 
+}else{
+  header("location: ../../index.php");
+  exit;
+}
+?>

@@ -1,11 +1,13 @@
 <!--  Header Start -->
 <?php
-$sql = "SELECT * FROM admin_login WHERE privilege = 'Administrator'";
+$privilege = $_SESSION["privilege"];
+$sql = "SELECT * FROM admin_login WHERE privilege = '$privilege'";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
   $row = $result->fetch_assoc();
   $username = $row['username'];
+  $fullname = $row['full_name'];
   $profile = $row['profile'];
   $password = $row['password'];
       if (!empty($profile)) {
@@ -120,7 +122,11 @@ if ($result->num_rows > 0) {
                 });
             });
         </script>
-
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" name="old_fullname" value="<?php echo $fullname; ?>" hidden readonly>
+          <input type="text" class="form-control" name="fullname" value="<?php echo $fullname; ?>">
+          <label for="floatingInput">Full Name</label>
+        </div>
         <div class="form-floating mb-3">
           <input type="text" class="form-control" name="old_username" value="<?php echo $username; ?>" hidden readonly>
           <input type="text" class="form-control" name="username" value="<?php echo $username; ?>">
@@ -131,6 +137,7 @@ if ($result->num_rows > 0) {
           <input type="password" class="form-control" id="" name="password" minlength="6">
           <label for="floatingPassword">Password</label>
         </div>
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ti ti-x fs-3"></i> Close</button>

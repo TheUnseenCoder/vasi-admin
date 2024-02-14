@@ -4,10 +4,7 @@ session_start();
 
 include '../../conn.php';
 
-if(!isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] !== true){
-    header("location: ../../index.php");
-    exit;
-}
+if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
 
 ?>
 <!DOCTYPE html>
@@ -167,3 +164,9 @@ if(!isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] !== true
 
 </body>
 </html>
+<?php 
+}else{
+  header("location: ../../index.php");
+  exit;
+}
+?>
