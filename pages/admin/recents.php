@@ -4,7 +4,7 @@ session_start();
 
 include '../../conn.php';
 
-if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
+if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])){
 
 ?>
 <!DOCTYPE html>
@@ -16,7 +16,7 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
 
   <?php include 'components/icon.php'; ?>
 
-  <title><?php echo $title; ?> | Products</title>
+  <title><?php echo $title; ?> | Recent Records</title>
 
 
 <!-- Add SweetAlert2 CDN -->
@@ -27,7 +27,6 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
 </head>
 
 <body>
-
 <?php include '../admin/components/navigation.php'; ?>
 
   <!--  Main wrapper -->
@@ -77,6 +76,9 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
                       <h6 class="fw-semibold mb-0 text-center">Date Encoded</h6>
                     </th>
                     <th class="border-bottom-0">
+                      <h6 class="fw-semibold mb-0 text-center">Reference#</h6>
+                    </th>
+                    <th class="border-bottom-0">
                       <h6 class="fw-semibold mb-0 text-center">Action</h6>
                     </th>
                   </tr>
@@ -98,6 +100,13 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $row['amount']; ?></h6></td>
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $row['returned_cash']; ?></h6></td>
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $formatted_date; ?></h6></td>
+                    <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php 
+                          if($row['reference_num'] !== null || $row['reference_num'] == " " ){
+                            echo $row['reference_num'];
+                          }else{
+                            echo "No Receipt";
+                          }
+                    ?></h6></td>
                     <td class="border-bottom-0 text-center">
                         <a class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#update-modal<?php echo $row['record_id']; ?>"><i class="ti ti-edit fs-3"></i> Update</a>
                         <!--<a href="functions/delete_product.php?id=<?php echo $row['product_name']; ?>" class="btn btn-sm btn-danger"><i class="ti ti-trash fs-3"></i> Delete</a>-->
@@ -157,7 +166,7 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
                 </div>
                 <div class="col-md-6">
                   <label for="reference">Reference #</label>
-                  <input type="text" name="reference" class="form-control" id="reference">
+                  <input type="text" name="reference_num" class="form-control" id="reference">
                 </div>
               </div>
 
@@ -207,9 +216,9 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
 
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label for="categorySelect">Category:</label>
+                  <label for="categorySelect">Expense:</label>
                   <select name="category_name" class="form-select" id="categorySelect" required>
-                    <option value="0" disabled selected>Select Category</option>
+                    <option value="0" disabled selected>Select Expense</option>
                     <?php
                     $sql = "SELECT * FROM admin_categories";
                     $result = mysqli_query($conn, $sql);
@@ -239,6 +248,24 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
 </div>
 
 <script>
+  document.getElementById('returned_cash').addEventListener('input', function() {
+    var amountInput = document.getElementById('amount');
+    var returnedCashInput = document.getElementById('returned_cash');
+    var categoryAmountInput = document.getElementById('category_amount');
+
+    // Get the values from the input fields
+    var amount = parseFloat(amountInput.value);
+    var returnedCash = parseFloat(returnedCashInput.value);
+
+    // If both values are valid, update the category amount
+    if (!isNaN(amount) && !isNaN(returnedCash)) {
+      var categoryAmount = amount - returnedCash;
+      categoryAmountInput.value = categoryAmount;
+    }
+  });
+</script>
+
+<script>
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("saveRecordBtn").addEventListener("click", function(event) {
         event.preventDefault();
@@ -256,6 +283,8 @@ document.addEventListener("DOMContentLoaded", function() {
         var amount = parseFloat(document.getElementById("amount").value) || 0;
         var returnedCash = parseFloat(document.getElementById("returned_cash").value) || 0;
         var totalAmount = categoryAmounts + returnedCash;
+         // Round the total amount to 2 decimal places
+         totalAmount = parseFloat(totalAmount.toFixed(2));
 
         if (amount !== totalAmount) {
             Swal.fire({
@@ -280,6 +309,7 @@ document.addEventListener("DOMContentLoaded", function() {
   $sql = "SELECT * FROM admin_records";
   if($rs=$conn->query($sql)){
       while ($row=$rs->fetch_assoc()) {
+        $id = $row['record_id'];
   ?>
 <div class="modal fade modal-xl" id="update-modal<?php echo $row['record_id']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -319,26 +349,30 @@ document.addEventListener("DOMContentLoaded", function() {
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label for="categorySelect">Project/Site</label>
+                  <label for="project_site">Project/Site</label>
                   <input type="textarea" name="project_site" class="form-control" id="project_site" value ="<?php echo $row['project_site']; ?>" required>
                 </div>
               </div>
                 
               <div class="row mb-2">
-                <div class="col-md-12">
+                <div class="col-md-6">
                   <label for="purpose">Purpose</label>
                   <input type="textarea" name="purpose" class="form-control" id="purpose" value ="<?php echo $row['purpose']; ?>" required>
                 </div>
+                <div class="col-md-6">
+                  <label for="reference">Reference #</label>
+                  <input type="text" name="reference_num" class="form-control" id="reference" value="<?php echo $row['reference_num']; ?>">
+                </div>
               </div>
 
-              <div class="row  mb-2">
+              <div class="row mb-2">
                 <div class="col-md-6">
                   <label for="amount">Amount</label>
-                  <input type="number" name="amount" class="form-control" id="amount" value ="<?php echo $row['amount']; ?>"  required>
+                  <input type="number" name="amount" class="form-control" id="amount<?php echo $row['record_id']; ?>" value="<?php echo $row['amount']; ?>" required onkeyup="calculateCategoryAmount('<?php echo $row['record_id']; ?>')">
                 </div>
                 <div class="col-md-6">
                   <label for="returned_cash">Returned Cash</label>
-                  <input type="number" name="returned_cash" class="form-control" value ="<?php echo $row['returned_cash']; ?>" id="returned_cash">
+                  <input type="number" name="returned_cash" class="form-control" id="returned_cash<?php echo $row['record_id']; ?>" value="<?php echo $row['returned_cash']; ?>" onkeyup="calculateCategoryAmount('<?php echo $row['record_id']; ?>')">
                 </div>
               </div>
             <hr><br>
@@ -405,7 +439,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       ?>    
               <div class="row mb-2">
                 <div class="col-md-6">
-                    <label for="categorySelect">Category:</label>
+                    <label for="categorySelect">Expense:</label>
                     <select name="category_name" class="form-select" id="categorySelect" required>
                         <?php
                         $sql_category = "SELECT * FROM admin_categories";
@@ -435,7 +469,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   </select>
                 </div>        
                 <div class="col-md-6">
-                <?php
+                   <?php
                         $sql_category1 = "SELECT * FROM admin_categories";
                         $result_category1 = mysqli_query($conn, $sql_category1);
                         while ($category_row1 = mysqli_fetch_assoc($result_category1)) {
@@ -445,12 +479,12 @@ document.addEventListener("DOMContentLoaded", function() {
                             $result_records = mysqli_query($conn, $sql_records);
                             if ($row_records = mysqli_fetch_assoc($result_records)) {
                                 $category_value = $row_records[$category_name_replace];
-                                echo "<label for='category_amount'>Amount</label>";
-                                echo "<input type='number' name='category_amount' class='form-control' id='category_amount' value='$category_value' required>";
+                                echo "<label for='category_amount$id'>Amount</label>";
+                                echo "<input type='number' name='category_amount' class='form-control' id='category_amount$id' value='$category_value' required readonly>";
                             }
                         }
                         ?>
-                </div>
+                    </div>
               </div>
 
           </div>
@@ -468,6 +502,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     }
   ?>
+
+<script>
+function calculateCategoryAmount(recordId) {
+    var amount = parseFloat(document.getElementById('amount' + recordId).value);
+    var returnedCash = parseFloat(document.getElementById('returned_cash' + recordId).value);
+    var categoryAmount = amount - returnedCash;
+    
+    categoryAmount = Math.round(categoryAmount * 100) / 100;
+    categoryAmount = categoryAmount.toFixed(2).replace(/\.00$/, "");
+
+    document.getElementById('category_amount' + recordId).value = categoryAmount;
+}
+</script>
+
 
 <script>
     function searchTable() {

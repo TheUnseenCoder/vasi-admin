@@ -220,7 +220,7 @@ if(isset($_SESSION["loggedinasadmin"])){
                         <select name="status" class="form-select" id="status" required>
                             <?php
                                 $id = $row['id'];
-                                $sql = "SELECT status FROM admin_login WHERE id = '$id'";
+                                $sql = "SELECT * FROM admin_login WHERE id = '$id'";
                                 $result = mysqli_query($conn, $sql);
                                 while ($row11 = mysqli_fetch_assoc($result)) {
                                 $status = $row11['status'];

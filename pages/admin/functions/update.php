@@ -84,8 +84,16 @@ elseif (isset($_POST["update_record"])) {
      $category_name = $_POST['category_name'];
      $category_amount = $_POST['category_amount'];
      $old_category_name = $_POST['old_category'];
+     $reference_num = $_POST['reference_num'];
+
+     if($reference_num == null || $reference_num == ""){
+        $reference = null;
+     }else{
+        $reference = $reference_num;
+     }
+
  
-     $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', $category_name = '$category_amount', $old_category_name = 0 WHERE record_id = '$id'"; 
+     $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', reference_num='$reference', $old_category_name = 0, $category_name = '$category_amount' WHERE record_id = '$id'"; 
      if (mysqli_query($conn, $sql)) {
         header("Location: ../recents.php");
      } else {
@@ -178,5 +186,40 @@ elseif (isset($_POST["update_design"])) {
             header('Location: ../dashboard.php');
         }
     }
+}
+elseif(isset($_POST['update_user'])){
+    $id = $_POST['id'];
+    $username = $_POST['username'];
+    $full_name = $_POST['full_name'];
+    $password = $_POST['password'];
+    $privilege = $_POST['privilege'];
+    $status = $_POST['status'];
+    $pass = md5($password);
+
+    $selector = "SELECT * FROM admin_login WHERE id = '$id' and password != '$pass'";
+    $result = mysqli_query($conn, $selector);
+    if(mysqli_num_rows($result) > 0){
+        $update = "UPDATE admin_login SET username='$username', full_name='$full_name', password='$pass', privilege='$privilege', status='$status' WHERE id='$id'";
+        if(mysqli_query($conn, $update)){
+            header('Location: ../userlist.php');   
+        }
+        else{
+            echo "Error: " . $conn->error;
+        }
+    }
+    else{
+        $update = "UPDATE admin_login SET username='$username', full_name='$full_name', privilege='$privilege', status='$status' WHERE id='$id'";
+        if(mysqli_query($conn, $update)){
+            header('Location: ../userlist.php');   
+        }
+        else{
+            echo "Error: " . $conn->error;
+        }
+    }
+
+
+
+
+
 }
 ?>

@@ -4,7 +4,7 @@ session_start();
 
 include '../../conn.php';
 
-if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
+if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])){
 
 ?>
 <!DOCTYPE html>
@@ -16,7 +16,7 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
 
   <?php include 'components/icon.php'; ?>
 
-  <title><?php echo $title; ?> | Categories</title>
+  <title><?php echo $title; ?> | Expense</title>
 
   
 
@@ -38,11 +38,11 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
         <div class="card w-100">
           <div class="card-body p-4">
             <div class="d-flex">
-              <h5 class="card-title fw-semibold mb-4">Categories</h5>
+              <h5 class="card-title fw-semibold mb-4">Expense</h5>
               <div class="flex-grow-1"></div>
               <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                 <i class="ti ti-square-plus fs-6"></i>
-                Add Category
+                Add Expense
               </button>
             </div>
             <div class="table-responsive">
@@ -53,7 +53,7 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
                       <h6 class="fw-semibold mb-0 text-center">ID</h6>
                     </th>
                     <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0 text-center">Category Name</h6>
+                      <h6 class="fw-semibold mb-0 text-center">Expense Name</h6>
                     </th>
                     <th class="border-bottom-0">
                       <h6 class="fw-semibold mb-0 text-center">Action</h6>
@@ -75,7 +75,7 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
                     </td>
                     <td class="border-bottom-0 d-flex justify-content-center align-items-center">
                         <a href="" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#update-modal<?php echo $row['category_id']; ?>"><i class="ti ti-edit fs-3"></i> Update</a>
-                        <a href="functions/delete_category.php?id=<?php echo $row['category_id']; ?>" class="btn btn-sm btn-danger"><i class="ti ti-trash fs-3"></i> Delete</a>
+                    <!--    <a href="functions/delete_category.php?id=<?php //echo $row['category_id']; ?>" class="btn btn-sm btn-danger"><i class="ti ti-trash fs-3"></i> Delete</a> -->
                     </td>
                     <?php
                             }

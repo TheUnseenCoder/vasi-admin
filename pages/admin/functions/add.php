@@ -100,10 +100,17 @@ elseif (isset($_POST["save_record"])) {
     $returned_cash = $_POST['returned_cash'];
     $category_name = $_POST['category_name'];
     $category_amount = $_POST['category_amount'];
+    $reference_num = $_POST['reference_num'];
+
+    if($reference_num == null || $reference_num == ""){
+        $reference = null;
+     }else{
+        $reference = $reference_num;
+     }
 
     // Insert into admin_records table
-    $sql = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, $category_name) 
-            VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', '$category_amount')";
+    $sql = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, reference_num, $category_name) 
+            VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', '$reference_num', '$category_amount')";
     if (mysqli_query($conn, $sql)) {
         // Redirect to success page or wherever you want
         header("Location: ../recents.php");
@@ -188,6 +195,37 @@ elseif (isset($_POST["add_stocks"])) {
     } else {
         echo "Selected product not found or is not usable.";
     }
+}
+elseif(isset($_POST['save_user'])){
+    $username = $_POST['username'];
+    $full_name = $_POST['full_name'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $privilege = $_POST['privilege'];
+    $status = $_POST['status'];
+
+    if ($password == $confirm_password){
+        $password = md5($password);
+
+        $selector = "SELECT * FROM admin_login WHERE username = '$username'";
+        $result = mysqli_query($conn, $selector);
+        if(mysqli_num_rows($result) > 0){
+            echo "Username is already taken";
+        }
+        else{
+            $sql = "INSERT admin_login SET full_name='$full_name', username='$username', password='$password', privilege='$privilege', status='status'";
+            if(mysqli_query($conn, $sql)){
+                header("Location: ../userlist.php");
+                exit();
+            }
+            else{
+                echo "Error: " . mysqli_error($conn);
+                header("Location: ../userlist.php");
+                exit();
+            }
+        }    
+    }
+
 }
 
 ?>

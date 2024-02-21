@@ -46,22 +46,29 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./category.php" aria-expanded="false">
+              <a class="sidebar-link" href="./expenses.php" aria-expanded="false">
                 <span>
                   <i class="ti ti-category"></i>
                 </span>
-                <span class="hide-menu">Categories</span>
+                <span class="hide-menu">Expenses</span>
               </a>
             </li>
-            <!-- <li class="sidebar-item">
-              <a class="sidebar-link" href="./warehouse.php" aria-expanded="false">
+            <?php 
+              if (isset($_SESSION['loggedinasadmin'])){
+
+            ?>
+             <li class="sidebar-item">
+              <a class="sidebar-link" href="./userlist.php" aria-expanded="false">
                 <span>
-                  <i class="ti ti-building-warehouse"></i>
+                  <i class="ti ti-user"></i>
                 </span>
-                <span class="hide-menu">Warehouse</span>
+                <span class="hide-menu">User List</span>
               </a>
             </li>
-            <li class="sidebar-item">
+            <?php
+              }
+            ?>
+           <!-- <li class="sidebar-item">
               <a class="sidebar-link" href="./supplier.php" aria-expanded="false">
                 <span>
                     <i class="ti ti-chart-bar"></i>

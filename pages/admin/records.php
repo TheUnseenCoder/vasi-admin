@@ -4,9 +4,10 @@ session_start();
 
 include '../../conn.php';
 
-if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
+if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])){
 
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -38,8 +39,12 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
           <div class="card-body p-4">
             <h5 class="card-title fw-semibold mb-4"> Monthly Records</h5>
             <div class="d-flex justify-content-end">
-               <a class="btn btn-sm btn-dark me-2" aria-current="page" target="_blank" href="functions/download_excel.php"><i class="ti ti-file-export fs-6"></i>Export Excel</a>
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <i class="ti ti-file-export fs-6"></i>
+                 Export Excel
+              </button>          
             </div>
+
             <div class="mb-3">
                 <label for="searchInput" class="form-label">Search:</label>
                 <input type="text" class="form-control" id="searchInput" onkeyup="searchTable()" placeholder="Enter search terms">
@@ -108,14 +113,42 @@ if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true |
           </div>
         </div>
       </div>
-
-
-
-
-
   </div>
 </div>
 
+<!-- DATE MODAL -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Export Excel</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2">
+          <div class="col-md">
+            <form action="functions/download_excel.php" method="post">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="from_date">From:</label>
+                        <input type="date" name="from_date" class="form-control" id="from_date" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="to_date">To:</label>
+                        <input type="date" name="to_date" class="form-control" id ="to_date" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ti ti-x fs-3"></i> Close</button>
+        <button type="submit" class="btn btn-primary" name="save_user"><i class="ti ti-device-floppy fs-3"></i> Save</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Main Template -->
 <script src="../../assets/libs/jquery/dist/jquery.min.js"></script>

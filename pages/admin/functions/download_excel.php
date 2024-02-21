@@ -24,15 +24,25 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 
-$current_month = date('m');
-$current_year = date('Y');
-$sql = "SELECT * FROM admin_records WHERE MONTH(date_encoded) = '$current_month' AND YEAR(date_encoded) = '$current_year' ORDER BY requested_by DESC";
+$from_date = $_POST['from_date'];
+$to_date = $_POST['to_date'];
+
+// Convert from_date to the desired format
+$from_date_formatted = date('Md,Y', strtotime($from_date));
+
+// Convert to_date to the desired format
+$to_date_formatted = date('Md,Y', strtotime($to_date));
+
+$sql = "SELECT * FROM admin_records 
+        WHERE DATE(date_encoded) BETWEEN '$from_date' AND '$to_date'  
+        ORDER BY requested_by DESC";
 $result = $conn->query($sql);
 
 if (mysqli_num_rows($result) > 0) {
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
-
+    $title = $from_date_formatted . '-' . $to_date_formatted;
+    $sheet->setTitle($title);
     // Fetch categories from admin_categories table
     $query = "SELECT category_name FROM admin_categories";
     $category_result = mysqli_query($conn, $query);
@@ -55,14 +65,14 @@ if (mysqli_num_rows($result) > 0) {
             $headers[$category_name_replace] = $category_name;
         }
 
-        // Add headers to the spreadsheet
+        // Add headers to the first sheet
         $columnIndex = 1;
         foreach ($headers as $header) {
             $sheet->setCellValueByColumnAndRow($columnIndex, 1, $header);
             $columnIndex++;
         }
 
-        // Fetch data from admin_records table and populate the spreadsheet
+        // Fetch data from admin_records table and populate the first sheet
         $rowIndex = 2;
         $prevRequestedBy = '';
 
@@ -121,7 +131,7 @@ if (mysqli_num_rows($result) > 0) {
             $rowIndex++;
         }
 
-        // Add totals row
+        // Add totals row to the first sheet
         $sheet->setCellValue('A' . $rowIndex, 'Total');
         $columnIndex = 2; // Start at the first index
         foreach ($headers as $key => $header) {
@@ -138,11 +148,9 @@ if (mysqli_num_rows($result) > 0) {
                 }
                 $columnIndex++;
             }
-}
+        }
 
-        
-
-        // Apply styles to the totals row
+        // Apply styles to the totals row of the first sheet
         $lastColumn = $sheet->getHighestColumn();
         $style = array(
             'borders' => array(
@@ -162,14 +170,17 @@ if (mysqli_num_rows($result) > 0) {
         );
         $sheet->getStyle('A' . $rowIndex . ':' . $lastColumn . $rowIndex)->applyFromArray($style);
 
-        // Apply auto size to columns
+        // Apply auto size to columns of the first sheet
         foreach (range('A', $lastColumn) as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
+        // Call the function to populate the second sheet
+        $spreadsheet = populateSecondSheet($spreadsheet, $from_date, $to_date, $conn, $headers);
+
         // Save and download the Excel file
         $writer = new Xlsx($spreadsheet);
-        $filename = 'MonthlyReport.xlsx';
+        $filename = 'MonthlyReport_from_' . $from_date . '_to_' . $to_date . '.xlsx';
         $writer->save($filename);
 
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -189,4 +200,116 @@ if (mysqli_num_rows($result) > 0) {
     // If there is no data to export
     exit("No data to export.");
 }
+
+function populateSecondSheet($spreadsheet, $from_date, $to_date, $conn, $headers) {
+    // Create a new sheet
+    $newSheet = $spreadsheet->createSheet();
+    // Convert from_date to the desired format
+    $from_date_formatted = date('Md,Y', strtotime($from_date));
+
+    // Convert to_date to the desired format
+    $to_date_formatted = date('Md,Y', strtotime($to_date));
+
+    $title = "Summary-".$from_date_formatted."-".$to_date_formatted;
+    $newSheet->setTitle($title);
+
+    // Fetch unique employee names from the admin_records table
+    $sql = "SELECT DISTINCT requested_by FROM admin_records 
+            WHERE DATE(date_encoded) BETWEEN '$from_date' AND '$to_date'  
+            ORDER BY requested_by ASC";
+    $result = $conn->query($sql);
+
+    // Check if there is data
+    if ($result && $result->num_rows > 0) {
+        // Initialize the row index
+        $rowIndex = 1;
+
+        // Add headers to the second sheet
+        $newSheet->setCellValue('A1', 'Category');
+        $columnIndex = 2;
+        foreach ($result as $row) {
+            $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex, $row['requested_by']);
+            $columnIndex++;
+        }
+        $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex, 'Total'); // Add title for the Total column
+
+        // Initialize arrays to store column totals and track non-zero columns
+        $columnTotals = array_fill(2, count($headers) - 1, 0);
+        $nonZeroColumns = array_fill(2, count($headers) - 1, false);
+
+        // Fetch data for each category
+        foreach ($headers as $category => $header) {
+            // Skip non-category columns and specified columns
+            if ($category === 'requested_by' || $category === 'date_encoded' || $category === 'purpose' || $category === 'project_site' || $category === 'amount' || $category === 'returned_cash') {
+                continue;
+            }
+
+            // Add category name to the first column
+            $newSheet->setCellValue('A' . ($rowIndex + 1), $header);
+
+            // Fetch data for each employee
+            $columnIndex = 2;
+            $categoryTotal = 0; // Initialize category total
+            foreach ($result as $row) {
+                $requested_by = $row['requested_by'];
+
+                // Fetch total amount for the current category and employee
+                $sql = "SELECT SUM($category) AS total FROM admin_records 
+                        WHERE requested_by = '$requested_by' AND DATE(date_encoded) BETWEEN '$from_date' AND '$to_date'";
+                $totalResult = $conn->query($sql);
+                $total = $totalResult->fetch_assoc()['total'];
+
+                // Add total amount to the corresponding cell
+                $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex + 1, $total);
+
+                // Add to column total
+                $columnTotals[$columnIndex] += $total;
+
+                // Add to category total
+                $categoryTotal += $total;
+
+                // Track non-zero columns
+                if ($total != 0) {
+                    $nonZeroColumns[$columnIndex] = true;
+                }
+
+                $columnIndex++;
+            }
+
+            // Set the total for the current category (including zeros)
+            $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex + 1, $categoryTotal);
+
+            // Move to the next row for the next category
+            $rowIndex++;
+        }
+
+        // Calculate the total for each non-zero column
+        $newSheet->setCellValue('A' . ($rowIndex + 1), 'Total');
+        $columnIndex = 2;
+        foreach ($columnTotals as $index => $total) {
+            if ($nonZeroColumns[$index]) {
+                $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex + 1, $total);
+            } else {
+                $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex + 1, '');
+            }
+            $columnIndex++;
+        }
+
+        // Find the empty cell in the total row and insert the total sum
+        $emptyCell = array_search('', $columnTotals);
+        if ($emptyCell !== false) {
+            $totalSum = array_sum(array_filter($columnTotals, function($value) {
+                return is_numeric($value);
+            }));
+            $newSheet->setCellValueByColumnAndRow($emptyCell, $rowIndex + 1, $totalSum);
+        }
+    } else {
+        // If no data is found, add a message
+        $newSheet->setCellValue('A1', 'No data found');
+    }
+
+    return $spreadsheet;
+}
+
+
 ?>

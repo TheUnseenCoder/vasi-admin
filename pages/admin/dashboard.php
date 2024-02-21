@@ -4,7 +4,7 @@ session_start();
 
 include '../../conn.php';
 
-if(isset($_SESSION["loggedinasadmin"]) || $_SESSION["loggedinasadmin"] == true || isset($_SESSION["loggedinasmainuser"]) || $_SESSION["loggedinasmainuser"] == true){
+if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])){
   
 ?>
 <!DOCTYPE html>
