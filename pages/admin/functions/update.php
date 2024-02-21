@@ -86,11 +86,11 @@ elseif (isset($_POST["update_record"])) {
      $old_category_name = $_POST['old_category'];
      $reference_num = $_POST['reference_num'];
 
-     if($reference_num == null || $reference_num == ""){
-        $reference = null;
-     }else{
+     if ($reference_num == "") {
+        $reference = "No Receipt";
+    } else {
         $reference = $reference_num;
-     }
+    }
 
  
      $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', reference_num='$reference', $old_category_name = 0, $category_name = '$category_amount' WHERE record_id = '$id'"; 

@@ -204,6 +204,13 @@ if (mysqli_num_rows($result) > 0) {
 function populateSecondSheet($spreadsheet, $from_date, $to_date, $conn, $headers) {
     // Create a new sheet
     $newSheet = $spreadsheet->createSheet();
+
+    // Set equal column widths
+    $newSheet->getColumnDimension('A')->setWidth(20); // Adjust width as needed
+    foreach(range('B', 'Z') as $column) {
+        $newSheet->getColumnDimension($column)->setWidth(15); // Adjust width as needed
+    }
+
     // Convert from_date to the desired format
     $from_date_formatted = date('Md,Y', strtotime($from_date));
 
@@ -225,7 +232,7 @@ function populateSecondSheet($spreadsheet, $from_date, $to_date, $conn, $headers
         $rowIndex = 1;
 
         // Add headers to the second sheet
-        $newSheet->setCellValue('A1', 'Category');
+        $newSheet->setCellValue('A1', 'Expenses');
         $columnIndex = 2;
         foreach ($result as $row) {
             $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex, $row['requested_by']);
@@ -260,7 +267,20 @@ function populateSecondSheet($spreadsheet, $from_date, $to_date, $conn, $headers
                 $total = $totalResult->fetch_assoc()['total'];
 
                 // Add total amount to the corresponding cell
-                $newSheet->setCellValueByColumnAndRow($columnIndex, $rowIndex + 1, $total);
+                $cell = $newSheet->getCellByColumnAndRow($columnIndex, $rowIndex + 1);
+                $cell->setValue($total);
+                if (is_numeric($total)) {
+                    // Apply borders only to cells with numeric values
+                    $styleArray = [
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ];
+                    $newSheet->getStyle($cell->getCoordinate())->applyFromArray($styleArray);
+                }
 
                 // Add to column total
                 $columnTotals[$columnIndex] += $total;

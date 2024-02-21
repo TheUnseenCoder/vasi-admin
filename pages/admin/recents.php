@@ -100,13 +100,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $row['amount']; ?></h6></td>
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $row['returned_cash']; ?></h6></td>
                     <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $formatted_date; ?></h6></td>
-                    <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php 
-                          if($row['reference_num'] !== null || $row['reference_num'] == " " ){
-                            echo $row['reference_num'];
-                          }else{
-                            echo "No Receipt";
-                          }
-                    ?></h6></td>
+                    <td class="border-bottom-0 text-center"><h6 class="fw-semibold mb-0"><?php echo $row['reference_num']    ?></h6></td>
                     <td class="border-bottom-0 text-center">
                         <a class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#update-modal<?php echo $row['record_id']; ?>"><i class="ti ti-edit fs-3"></i> Update</a>
                         <!--<a href="functions/delete_product.php?id=<?php echo $row['product_name']; ?>" class="btn btn-sm btn-danger"><i class="ti ti-trash fs-3"></i> Delete</a>-->
@@ -361,7 +355,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
                 <div class="col-md-6">
                   <label for="reference">Reference #</label>
+                  <?php 
+                  if($row['reference_num'] == "No Receipt"){
+                  ?>
+                  <input type="text" name="reference_num" class="form-control" id="reference" value="">
+                  <?php
+                  }else{
+                   ?>
                   <input type="text" name="reference_num" class="form-control" id="reference" value="<?php echo $row['reference_num']; ?>">
+                  <?php } ?>
                 </div>
               </div>
 

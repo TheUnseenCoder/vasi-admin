@@ -102,15 +102,15 @@ elseif (isset($_POST["save_record"])) {
     $category_amount = $_POST['category_amount'];
     $reference_num = $_POST['reference_num'];
 
-    if($reference_num == null || $reference_num == ""){
-        $reference = null;
-     }else{
+    if (!isset($reference_num)) {
+        $reference = "No Receipt";
+    } else {
         $reference = $reference_num;
-     }
+    }
 
     // Insert into admin_records table
     $sql = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, reference_num, $category_name) 
-            VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', '$reference_num', '$category_amount')";
+            VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', '$reference', '$category_amount')";
     if (mysqli_query($conn, $sql)) {
         // Redirect to success page or wherever you want
         header("Location: ../recents.php");
