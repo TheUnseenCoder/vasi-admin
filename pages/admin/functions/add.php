@@ -62,12 +62,12 @@ elseif (isset($_POST["save_category"])) {
         // Now, you can proceed with your existing code for inserting a category
 
         // Create a prepared statement for inserting a category
-        $sqlInsertCategory = "INSERT INTO admin_categories (category_name) VALUES (?)";
+        $sqlInsertCategory = "INSERT INTO admin_categories (category_name, category_change) VALUES (?, ?)";
         $stmtInsertCategory = mysqli_prepare($conn, $sqlInsertCategory);
 
         if ($stmtInsertCategory) {
             // Bind parameters and execute the query
-            mysqli_stmt_bind_param($stmtInsertCategory, "s", $category_name);
+            mysqli_stmt_bind_param($stmtInsertCategory, "ss", $category_name, $category_column);
 
             if (mysqli_stmt_execute($stmtInsertCategory)) {
                 // Query executed successfully
@@ -92,35 +92,65 @@ elseif (isset($_POST["save_category"])) {
     $conn->close();
 }
 elseif (isset($_POST["save_record"])) {
-    // Retrieve form data
-    $requested_by = $_POST['requested_by'];
-    $project_site = $_POST['project_site'];
-    $purpose = $_POST['purpose'];
-    $amount = $_POST['amount'];
-    $returned_cash = $_POST['returned_cash'];
-    $category_name = $_POST['category_name'];
-    $category_amount = $_POST['category_amount'];
-    $reference_num = $_POST['reference_num'];
+    // Extract data from $_POST
+    $requested_by = $_POST['add_requested_by'];
+    $project_site = $_POST['add_project_site'];
+    $purpose = $_POST['add_purpose'];
+    $amount = $_POST['add_amount'];
+    $returned_cash = $_POST['add_returned_cash'];
+    $category_names = $_POST['add_category_name'];
+    $category_amounts = $_POST['add_category_amount'];
+    $supplier_names = $_POST['add_supplier_name'];
+    $addresses = $_POST['add_address'];
+    $tins = $_POST['add_tin'];
+    $doc_types = $_POST['add_doc_type'];
+    $doc_nums = isset($_POST['add_doc_num']) ? $_POST['add_doc_num'] : "No Receipt";
+    $goods_service_others = $_POST['add_goods_service_others'];
+    $particulars = $_POST['add_particulars'];
 
-    if (!isset($reference_num)) {
-        $reference = "No Receipt";
+    // Convert array values to comma-separated strings
+    $category_names_str = implode(", ", array_map(function($name) { return "`$name`"; }, $category_names));
+    $category_amounts_str = implode(", ", $category_amounts);
+    
+    // Combine arrays into single strings
+    $category_amount = "'" . implode(", ", $category_amounts) . "'";
+    $category_name = "'" . implode(", ", $category_names) . "'";
+    $supplier_names_str = "'" . implode(", ", $supplier_names) . "'";
+    $addresses_str = "'" . implode(", ", $addresses) . "'";
+    $tins_str = "'" . implode(", ", $tins) . "'";
+    $doc_types_str = "'" . implode(", ", $doc_types) . "'";
+    $doc_nums_str = isset($_POST['add_doc_num']) ? "'" . implode(", ", $_POST['add_doc_num']) . "'" : "'No Receipt'";
+    $goods_service_others_str = "'" . implode(", ", $goods_service_others) . "'";
+    $particulars_str = "'" . implode(", ", $particulars) . "'";
+
+    // Create SQL query for admin_records table
+    $sql_records = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, $category_names_str) 
+                    VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', $category_amounts_str)";
+
+    // Execute SQL query for admin_records table
+    if (mysqli_query($conn, $sql_records)) {
+        $record_id = mysqli_insert_id($conn);
+
+        // Create SQL query for admin_record_details table
+        $sql_details = "INSERT INTO admin_record_details (record_id, category_names, category_amounts, supplier_name, address, tin, doc_type, doc_num, goods_service_others, particulars) 
+                        VALUES ('$record_id', $category_name, $category_amount, $supplier_names_str, $addresses_str, $tins_str, $doc_types_str, $doc_nums_str, $goods_service_others_str, $particulars_str)";
+
+        // Execute SQL query for admin_record_details table
+        if (mysqli_query($conn, $sql_details)) {
+            mysqli_close($conn);
+            // ADD A SUCCESS SWEETALERT UPON DEPLOYMENT
+            header('Location: ../sample.php'); //change to recents.php when done
+            exit();
+        } else {
+            // ADD A ERROR SWEETALERT UPON DEPLOYMENT
+            echo "Error adding record details: " . mysqli_error($conn);
+            echo "SQL for admin_records: $sql_records <br>";
+            echo "SQL for admin_record_details: $sql_details <br>";
+
+        }
     } else {
-        $reference = $reference_num;
+        echo "Error adding record: " . mysqli_error($conn);
     }
-
-    // Insert into admin_records table
-    $sql = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, reference_num, $category_name) 
-            VALUES ('$requested_by', '$project_site', '$purpose', '$amount', '$returned_cash', '$reference', '$category_amount')";
-    if (mysqli_query($conn, $sql)) {
-        // Redirect to success page or wherever you want
-        header("Location: ../recents.php");
-    } else {
-        echo "Error adding column: " . $conn->error;
-    }
-
-    // Close database connection
-    mysqli_close($conn);
-
 }
 elseif (isset($_POST["save_supplier"])) {
     $supplier_name = $_POST['supplier_name'];

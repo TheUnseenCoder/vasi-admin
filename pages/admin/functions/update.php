@@ -1,6 +1,8 @@
 <?php
+session_start();
 include '../../../conn.php';
 date_default_timezone_set('Asia/Manila');
+ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 
 if (isset($_POST["update_employee"])) {
     $employee_id = $_POST['employee_id'];
@@ -21,10 +23,10 @@ elseif (isset($_POST["update_category"])) {
     $category_name = $_POST['category_name'];
     $category_old_name = strtolower($_POST['category_old_name']);
     $category_new_name = strtolower($_POST['category_name']);
-    
-    $sqlUpdateCategory = "UPDATE admin_categories SET category_name = ? WHERE category_id = ?";
+    $category_newest = strtolower(str_replace([' - ', ', ', ' / ', '-', ',','/',' '], '_', $category_new_name));
+    $sqlUpdateCategory = "UPDATE admin_categories SET category_name = ?, category_change =? WHERE category_id = ?";
     $stmtUpdateCategory = $conn->prepare($sqlUpdateCategory);
-    $stmtUpdateCategory->bind_param("si", $category_name, $category_id);
+    $stmtUpdateCategory->bind_param("ssi", $category_name, $category_newest, $category_id);
     
     if ($stmtUpdateCategory->execute()) {
         $stmtUpdateCategory->close();
@@ -59,103 +61,89 @@ elseif (isset($_POST["update_warehouse"])) {
         header('Location: ../warehouse.php');
     }
 }
-elseif (isset($_POST["update_supplier"])) {
-    $supplier_id = $_POST['supplier_id'];
-    $supplier_name = $_POST['supplier_name'];
-    $supplier_add = $_POST['supplier_add'];
-    $supplier_email = $_POST['supplier_email'];
-
-    $sql = "UPDATE admin_suppliers SET supplier_name = ?, supplier_add = ?, supplier_email = ? WHERE supplier_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $supplier_name, $supplier_add, $supplier_email, $supplier_id);
-    if ($stmt->execute()) {
-        $stmt->close();
-        mysqli_close($conn);
-        header('Location: ../supplier.php');
-    }
-}
 elseif (isset($_POST["update_record"])) {
-     $id = $_POST['id'];
-     $requested_by = $_POST['requested_by'];
-     $project_site = $_POST['project_site'];
-     $purpose = $_POST['purpose'];
-     $amount = $_POST['amount'];
-     $returned_cash = $_POST['returned_cash'];
-     $category_name = $_POST['category_name'];
-     $category_amount = $_POST['category_amount'];
-     $old_category_name = $_POST['old_category'];
-     $reference_num = $_POST['reference_num'];
+    // Retrieve form data
+    $id = $_POST['id'];
+    $requested_by = $_POST['requested_by'];
+    $project_site = $_POST['project_site'];
+    $purpose = $_POST['purpose'];
+    $amounts = $_POST['amount'];
+    $returned_cash = $_POST['returned_cash'];
 
-     if ($reference_num == "") {
-        $reference = "No Receipt";
-    } else {
-        $reference = $reference_num;
-    }
+    // Prepare arrays for expenses data
+    $update_supplier_name = $_POST['update_supplier_name'];
+    $update_address = $_POST['update_address'];
+    $update_category_name = $_POST['update_category_name'];
+    $update_category_amount = $_POST['update_category_amount'];
+    $update_tin = $_POST['update_tin'];
+    $update_doc_type = $_POST['update_doc_type'];
+    $update_doc_num = $_POST['update_doc_num'];
+    $update_goods_service_others = $_POST['update_goods_service_others'];
+    $update_particular = $_POST['update_particular'];
+    $old_category_name = $_POST['old_category_name'];
 
- 
-     $sql = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amount', returned_cash = '$returned_cash', reference_num='$reference', $old_category_name = 0, $category_name = '$category_amount' WHERE record_id = '$id'"; 
-     if (mysqli_query($conn, $sql)) {
-        header("Location: ../recents.php");
-     } else {
-         echo "Error adding column: " . $conn->error;
-     }
+    // Compute total amounts
+    $totalAmount = $amounts + $returned_cash;
 
-     mysqli_close($conn);
-} 
-elseif (isset($_POST["update_account"])) {
-    // WAG GAGALAWIN!!!
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    $privilege = "Administrator";
-    $old_profile_picture = $_POST['old_profile_image'];
-    $old_username = trim($_POST['old_username']);
-    $old_password = trim($_POST['old_password']);
-    $password_hashed = $old_password_hashed = null;
-    if (!empty($password)) {
-        $password_hashed = md5($password);
-    }
-    $uploadDirectory = 'uploads/';
-    if (!file_exists($uploadDirectory)) {
-        mkdir($uploadDirectory, 0755, true);
-    }
-    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == UPLOAD_ERR_OK) {
-        $temp_name = $_FILES['profile_image']['tmp_name'];
-        $image_name = $_FILES['profile_image']['name'];
-        $new_image_path = $uploadDirectory . $image_name;
-        move_uploaded_file($temp_name, $new_image_path);
-    } else {
-        $new_image_path = $old_profile_picture;
-    }
-    $changed_fields = [];
-    if ($username != $old_username) {
-        $changed_fields['username'] = $username;
-    }
-    if (!empty($password) && $password_hashed != $old_password_hashed) {
-        $changed_fields['password'] = $password_hashed;
-    }
-    if ($new_image_path != $old_profile_picture) {
-        $changed_fields['profile'] = $new_image_path;
-    }
-   if (!empty($changed_fields)) {
-        $sql = "UPDATE admin_login SET ";
-        $types = '';
-        foreach ($changed_fields as $field => $value) {
-            $sql .= "$field = ?, ";
-            $types .= 's'; 
-        }
-        $sql = rtrim($sql, ', ');
-        $sql .= " WHERE privilege = ?";
-        $types .= 's';
-        $stmt = $conn->prepare($sql);
-        $values = array_values($changed_fields);
-        $values[] = $privilege; 
-        $stmt->bind_param($types, ...$values);
-        if ($stmt->execute()) {
-            $stmt->close();
-            header('Location: ../dashboard.php');
+    // Iterate over each category amount and sum them up
+    $totalCategoryAmount = 0;
+    foreach ($_POST['update_category_amount'] as $amountString) {
+        $individualAmounts = explode(', ', $amountString);
+        foreach ($individualAmounts as $amount) {
+            $totalCategoryAmount += floatval($amount);
         }
     }
+
+    if ($totalAmount != $totalCategoryAmount) {
+        // Return error message
+        $response = array("failed" => true, "message" => "The total amount entered in the categories does not match the total amount.");
+        $_SESSION['response'] = $response;
+    } else {
+        // Prepare values for SQL query
+        $category_amount = implode(", ", $update_category_amount);
+        $category_name = implode(", ", $update_category_name);
+        $supplier_names_str = implode(", ", $update_supplier_name);
+        $addresses_str = implode(", ", $update_address);
+        $tins_str = implode(", ", $update_tin);
+        $doc_types_str = implode(", ", $update_doc_type);
+        $doc_nums_str = implode(", ", $update_doc_num);
+        $goods_service_others_str = implode(", ", $update_goods_service_others);
+        $particulars_str = implode(", ", $update_particular);
+
+
+        // Construct the SQL query for updating the main record
+        $sqlMainRecord = "UPDATE admin_records SET requested_by = '$requested_by', project_site = '$project_site', purpose = '$purpose', amount = '$amounts', returned_cash = '$returned_cash'";
+        foreach ($old_category_name as $value) {
+            $sqlMainRecord .= ", `$value` = 0";
+        }
+        foreach ($update_category_name as $key => $value) {
+            $sqlMainRecord .= ", `$value` = '{$update_category_amount[$key]}'";
+        }
+        $sqlMainRecord .= " WHERE record_id = '$id'";
+    
+        // Execute the main record update query
+        if (mysqli_query($conn, $sqlMainRecord)) {
+            // Construct the SQL query for updating expenses details
+            $sqlUpdateExpense = "UPDATE admin_record_details SET category_names = '$category_name', category_amounts = '$category_amount', supplier_name = '$supplier_names_str', address = '$addresses_str', tin = '$tins_str', doc_type = '$doc_types_str', doc_num = '$doc_nums_str', goods_service_others = '$goods_service_others_str', particulars = '$particulars_str' WHERE record_id = '$id'";
+            // Execute the expenses details update query
+            if (mysqli_query($conn, $sqlUpdateExpense)) {
+                $response = array("success" => true, "message" => "Record updated successfully.");
+            } else {
+                $response = array("failed" => true, "message" => "Error updating expenses details: " . mysqli_error($conn));
+            }
+        } else {
+            $response = array("failed" => true, "message" => "Error updating record: " . mysqli_error($conn));
+        }
+    
+        // Store response in session
+        $_SESSION['response'] = $response;
+    }
+
+    // Redirect to the appropriate page
+    header('Location: ../sample.php?modal-update=' . $id);
+    exit();
 }
+
 elseif (isset($_POST["update_design"])) {
     $title = trim($_POST['title']);
     $old_title = trim($_POST['old_title']);
@@ -216,10 +204,9 @@ elseif(isset($_POST['update_user'])){
             echo "Error: " . $conn->error;
         }
     }
-
-
-
-
-
+} else {
+    // If update_record parameter is not set, return an error
+    $response = array("success" => false, "message" => "Invalid request.");
+    echo json_encode($response);
 }
 ?>

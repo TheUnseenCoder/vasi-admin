@@ -157,9 +157,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
 <!-- Your other scripts -->
 <script src="../../assets/js/sidebarmenu.js"></script>
 <script src="../../assets/js/app.min.js"></script>
-<script src="../../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-<script src="../../assets/libs/simplebar/dist/simplebar.js"></script>
-<script src="../../assets/js/dashboard.js"></script>
+
 
 <script>
     function searchTable() {
