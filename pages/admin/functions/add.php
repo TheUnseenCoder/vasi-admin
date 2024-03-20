@@ -3,23 +3,6 @@ ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_report
 include '../../../conn.php';
 date_default_timezone_set('Asia/Manila');
 
-// function generateSerialNumber() {
-//     // Set the time zone to Asia/Manila
-//     date_default_timezone_set('Asia/Manila');
-    
-//     // Get the current date components
-//     $year = date("Y");
-//     $month = date("m");
-//     $day = date("d");
-    
-//     // Generate a random 4-digit number
-//     $randomNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-    
-//     // Create the serial number
-//     $serialNumber = "$year$month$day$randomNumber";
-    
-//     return $serialNumber;
-// }
 
 if (isset($_POST["save_employee"])) {
     // Get the employee name from the form
@@ -101,12 +84,43 @@ elseif (isset($_POST["save_record"])) {
     $category_names = $_POST['add_category_name'];
     $category_amounts = $_POST['add_category_amount'];
     $supplier_names = $_POST['add_supplier_name'];
-    $addresses = $_POST['add_address'];
-    $tins = $_POST['add_tin'];
+    $transaction_date = $_POST['add_transaction_date'];
+    $v_nv = $_POST['add_v_nv'];
+    $addresses = isset($_POST['add_address']) ? $_POST['add_address'] : "No Address";
+    $tins = isset($_POST['add_tin']) ? $_POST['add_tin'] : "No TIN";
     $doc_types = $_POST['add_doc_type'];
-    $doc_nums = isset($_POST['add_doc_num']) ? $_POST['add_doc_num'] : "No Receipt";
+    $doc_nums = isset($_POST['add_doc_num']) ? $_POST['add_doc_num'] : "No Doc Num";
     $goods_service_others = $_POST['add_goods_service_others'];
     $particulars = $_POST['add_particulars'];
+
+
+    // Determine company types for each category name
+    $company_types = [];
+    foreach ($supplier_names as $name) {
+        $company_type = "";
+        $name_lower = strtolower($name);
+        if (
+            strpos($name_lower, "corp") !== false || 
+            strpos($name_lower, "inc") !== false || 
+            strpos($name_lower, "corporation") !== false || 
+            strpos($name_lower, "company") !== false || 
+            strpos($name_lower, "incorporated") !== false
+        ) {
+            $company_type = "Corporation";
+        } elseif (
+            substr($name_lower, -2) === "co" || 
+            substr($name_lower, -3) === "co." || 
+            substr($name_lower, -3) === "ltd" || 
+            substr($name_lower, -5) === "hotel"
+        ) {
+            $company_type = "Corporation";
+        } else {
+            $company_type = "Individual";
+        }
+        $company_types[] = $company_type;
+    }
+    
+
 
     // Convert array values to comma-separated strings
     $category_names_str = implode(", ", array_map(function($name) { return "`$name`"; }, $category_names));
@@ -122,6 +136,9 @@ elseif (isset($_POST["save_record"])) {
     $doc_nums_str = isset($_POST['add_doc_num']) ? "'" . implode(", ", $_POST['add_doc_num']) . "'" : "'No Receipt'";
     $goods_service_others_str = "'" . implode(", ", $goods_service_others) . "'";
     $particulars_str = "'" . implode(", ", $particulars) . "'";
+    $company_types_str = "'" . implode(", ", $company_types) . "'";
+    $transaction_date_str = "'" . implode(", ", $transaction_date) . "'";
+    $v_nv_str = "'" . implode(", ", $v_nv) . "'";
 
     // Create SQL query for admin_records table
     $sql_records = "INSERT INTO admin_records (requested_by, project_site, purpose, amount, returned_cash, $category_names_str) 
@@ -132,24 +149,21 @@ elseif (isset($_POST["save_record"])) {
         $record_id = mysqli_insert_id($conn);
 
         // Create SQL query for admin_record_details table
-        $sql_details = "INSERT INTO admin_record_details (record_id, category_names, category_amounts, supplier_name, address, tin, doc_type, doc_num, goods_service_others, particulars) 
-                        VALUES ('$record_id', $category_name, $category_amount, $supplier_names_str, $addresses_str, $tins_str, $doc_types_str, $doc_nums_str, $goods_service_others_str, $particulars_str)";
+        $sql_details = "INSERT INTO admin_record_details (record_id, transaction_date, category_names, category_amounts, supplier_name, address, tin, doc_type, doc_num, goods_service_others, particulars, company_types, v_nv) 
+                        VALUES ('$record_id', $transaction_date_str, $category_name, $category_amount, $supplier_names_str, $addresses_str, $tins_str, $doc_types_str, $doc_nums_str, $goods_service_others_str, $particulars_str, $company_types_str, $v_nv_str)";
 
         // Execute SQL query for admin_record_details table
         if (mysqli_query($conn, $sql_details)) {
             mysqli_close($conn);
-            // ADD A SUCCESS SWEETALERT UPON DEPLOYMENT
-            header('Location: ../sample.php'); //change to recents.php when done
+            $response = array("success" => true, "message" => "Record updated successfully.");
+            header('Location: ../recents.php'); //change to recents.php when done
             exit();
         } else {
             // ADD A ERROR SWEETALERT UPON DEPLOYMENT
-            echo "Error adding record details: " . mysqli_error($conn);
-            echo "SQL for admin_records: $sql_records <br>";
-            echo "SQL for admin_record_details: $sql_details <br>";
-
+            $response = array("failed" => true, "message" => "Error updating expenses details: " . mysqli_error($conn));
         }
     } else {
-        echo "Error adding record: " . mysqli_error($conn);
+        $response = array("failed" => true, "message" => "Error updating expenses details: " . mysqli_error($conn));
     }
 }
 elseif (isset($_POST["save_supplier"])) {

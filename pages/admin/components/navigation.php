@@ -34,7 +34,7 @@
                 <span>
                   <i class="ti ti-report-analytics"></i>
                 </span>
-                <span class="hide-menu">Recent Records</span>
+                <span class="hide-menu">Recent Expense Records</span>
               </a>
             </li>
             <li class="sidebar-item">
@@ -85,7 +85,7 @@
                 <span>
                   <i class="ti ti-report"></i>
                 </span>
-                <span class="hide-menu">Records</span>
+                <span class="hide-menu">All Expense Record</span>
               </a>
             </li>
           </ul>

@@ -12,6 +12,8 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
   }else{
     $response="";
   }
+  $this_month = date('F');
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -22,7 +24,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
 
   <?php include 'components/icon.php'; ?>
 
-  <title><?php echo $title; ?> | Recent Records</title>
+  <title><?php echo $title; ?> | <?php echo $this_month; ?> Records</title>
 
 
 <!-- Add SweetAlert2 CDN -->
@@ -48,7 +50,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
         <div class="card w-100">
           <div class="card-body p-4">
             <div class="d-flex">
-              <h5 class="card-title fw-semibold mb-4">Employee List
+              <h5 class="card-title fw-semibold mb-4"> Recent Expense Records (<?php echo $this_month; ?>)
               </h5>
               <div class="flex-grow-1"></div>
               <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
@@ -95,7 +97,9 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                 </thead>
                 <tbody>
                 <?php
-                    $sql = "SELECT * FROM admin_records ORDER BY date_encoded DESC";
+                    $current_month = date('m');
+                    $current_year = date('Y');
+                    $sql = "SELECT * FROM admin_records WHERE MONTH(date_encoded) = '$current_month' AND YEAR(date_encoded) = '$current_year' ORDER BY date_encoded DESC";
                     if($rs=$conn->query($sql)){
                         $i = 1;
                         while ($row=$rs->fetch_assoc()) {
@@ -189,12 +193,34 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
             <hr><br>
               <div class="row mb-2">
                 <div class="col-md-2">
+                  <label for="add_transaction_date">Transaction Date</label>
+                  <input type="date" name="add_transaction_date[]" class="form-control" id="add_transaction_date" required>
+                </div>
+                <div class="col-md-2">
                   <label for="add_supplier_name">Supplier Name</label>
                   <input type="text" name="add_supplier_name[]" class="form-control" id="add_supplier_name" required>
                 </div>
-              <div class="col-md-5">
+                <div class="col-md-5">
                   <label for="add_address">Address</label>
-                  <input type="textarea" name="add_address[]" class="form-control" id="add_address" required>
+                  <input type="textarea" name="add_address[]" class="form-control" id="add_address">
+                </div>
+                <div class="col-md-3">
+                  <label for="add_tin">TIN</label>
+                  <input type="text" name="add_tin[]" class="form-control" id="add_tin">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-3">
+                  <label for="add_doctype">Document Type</label>
+                  <select name="add_doc_type[]" class="form-select" id="add_doctype" required>
+                    <option value="0" disabled selected>Select Document Type</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="add_doc_num">Doc Number</label>
+                  <input type="text" name="add_doc_num[]" class="form-control" id="add_doc_num">
                 </div>
                 <div class="col-md-3">
                   <label for="categorySelect">Expense:</label>
@@ -211,27 +237,19 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                     ?>
                   </select>
                 </div>        
-                <div class="col-md-2">
+                <div class="col-md-3">
                   <label for="add_category_amount">Amount</label>
                   <input type="number" name="add_category_amount[]" class="form-control" id="add_category_amount" required>
                 </div>
               </div>
               <div class="row mb-2">
                 <div class="col-md-2">
-                  <label for="add_tin">TIN</label>
-                  <input type="text" name="add_tin[]" class="form-control" id="add_tin" required>
-                </div>
-              <div class="col-md-2">
-                  <label for="add_doctype">Document Type</label>
-                  <select name="add_doc_type[]" class="form-select" id="add_doctype" required>
-                    <option value="0" disabled selected>Select Document Type</option>
-                    <option value="OR">OR</option>
-                    <option value="SI">SI</option>
+                  <label for="add_v_nv">V/NV</label>
+                  <select name="add_v_nv[]" class="form-select" id="add_v_nv" required>
+                    <option value="0" disabled selected>Please Select</option>
+                    <option value="V">V</option>
+                    <option value="NV">NV</option>
                   </select>
-                </div>
-                <div class="col-md-2">
-                  <label for="add_doc_num">Doc Number</label>
-                  <input type="text" name="add_doc_num[]" class="form-control" id="add_doc_num">
                 </div>      
                 <div class="col-md-2">
                   <label for="add_goods_service_others">Goods/Service/Others</label>
@@ -242,7 +260,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                     <option value="Others">Others</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8">
                   <label for="add_particulars">Particulars</label>
                   <input type="text" name="add_particulars[]" class="form-control" id="add_particulars">
                 </div>
@@ -250,11 +268,13 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
               <hr><br>
 
               <div class="row mb-2">
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-secondary" id="btn_add_expenses">ADD EXPENSES</button>
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-success" id="btn_add_expenses">ADD EXPENSES</button>
                 </div>      
-                <div class="col-md-4">
-                  <button type="button" class="btn btn-secondary" id="btn_remove_expenses">REMOVE PREVIOUS</button>
+                <div class="col-md-3">
+                  <button type="button" class="btn btn-danger" id="btn_remove_expenses">REMOVE PREVIOUS</button>
+                </div>        
+                <div class="col-md-8">
                 </div>        
               </div>
           </div>
@@ -291,13 +311,35 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
             <div class="added-expense">
             <br>
             <div class="row mb-2">
+              <div class="col-md-2">
+                  <label for="add_transaction_date">Transaction Date</label>
+                  <input type="date" name="add_transaction_date[]" class="form-control" id="add_transaction_date" required>
+                </div>
                 <div class="col-md-2">
                   <label for="add_supplier_name">Supplier Name</label>
                   <input type="text" name="add_supplier_name[]" class="form-control" id="add_supplier_name" required>
                 </div>
-              <div class="col-md-5">
+                <div class="col-md-5">
                   <label for="add_address">Address</label>
-                  <input type="textarea" name="add_address[]" class="form-control" id="add_address" required>
+                  <input type="textarea" name="add_address[]" class="form-control" id="add_address">
+                </div>
+                <div class="col-md-3">
+                  <label for="add_tin">TIN</label>
+                  <input type="text" name="add_tin[]" class="form-control" id="add_tin">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-3">
+                  <label for="add_doctype">Document Type</label>
+                  <select name="add_doc_type[]" class="form-select" id="add_doctype" required>
+                    <option value="0" disabled selected>Select Document Type</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="add_doc_num">Doc Number</label>
+                  <input type="text" name="add_doc_num[]" class="form-control" id="add_doc_num">
                 </div>
                 <div class="col-md-3">
                   <label for="categorySelect">Expense:</label>
@@ -314,28 +356,20 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                     ?>
                   </select>
                 </div>        
-                <div class="col-md-2">
+                <div class="col-md-3">
                   <label for="add_category_amount">Amount</label>
                   <input type="number" name="add_category_amount[]" class="form-control" id="add_category_amount" required>
                 </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-2">
-                  <label for="add_tin">TIN</label>
-                  <input type="text" name="add_tin[]" class="form-control" id="add_tin" required>
-                </div>
+            </div>
+            <div class="row mb-2">      
               <div class="col-md-2">
-                  <label for="add_doctype">Document Type</label>
-                  <select name="add_doc_type[]" class="form-select" id="add_doctype" required>
-                    <option value="0" disabled selected>Select Document Type</option>
-                    <option value="OR">OR</option>
-                    <option value="SI">SI</option>
+                  <label for="add_v_nv">V/NV</label>
+                  <select name="add_v_nv[]" class="form-select" id="add_v_nv" required>
+                    <option value="0" disabled selected>Please Select</option>
+                    <option value="V">V</option>
+                    <option value="NV">NV</option>
                   </select>
                 </div>
-                <div class="col-md-2">
-                  <label for="add_doc_num">Doc Number</label>
-                  <input type="text" name="add_doc_num[]" class="form-control" id="add_doc_num">
-                </div>      
                 <div class="col-md-2">
                   <label for="add_goods_service_others">Goods/Service/Others</label>
                   <select name="add_goods_service_others[]" class="form-select" id="add_goods_service_others" required>
@@ -345,7 +379,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                     <option value="Others">Others</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8">
                   <label for="add_particulars">Particulars</label>
                   <input type="text" name="add_particulars[]" class="form-control" id="add_particulars">
                 </div>
@@ -420,7 +454,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
 
           var amount = parseFloat(document.getElementById("add_amount").value) || 0;
           var returnedCash = parseFloat(document.getElementById("add_returned_cash").value) || 0;
-          var totalAmount = amount + returnedCash;
+          var totalAmount = amount - returnedCash;
           // Round the total amount to 2 decimal places
           totalAmount = parseFloat(totalAmount.toFixed(2));
 
@@ -450,8 +484,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                           title: 'Success',
                           text: 'Record added successfully.',
                           onClose: function() {
-                              // Redirect or perform any other action after success
-                              window.location.href = 'sample.php';
+                              window.location.href = 'recents.php';
                           }
                       });
                   },
@@ -553,6 +586,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                                     while($row_details = mysqli_fetch_assoc($res_details)){
                                         $supplier = $row_details['supplier_name'];
                                         $address = $row_details['address'];
+                                        $transaction_date = $row_details['transaction_date'];
                                         $tin = $row_details['tin'];
                                         $doc_type = $row_details['doc_type'];
                                         $doc_num = $row_details['doc_num'];
@@ -560,8 +594,10 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                                         $particulars = $row_details['particulars'];
                                         $category_name = $row_details['category_names'];
                                         $category_amount = $row_details['category_amounts'];
+                                        $v_nv = $row_details['v_nv'];
 
                                         // Separate data into arrays
+                                        $transaction_date_array = explode(", ", $transaction_date);
                                         $supplier_array = explode(", ", $supplier);
                                         $address_array = explode(", ", $address);
                                         $tin_array = explode(", ", $tin);
@@ -571,26 +607,49 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                                         $particulars_array = explode(", ", $particulars);
                                         $category_name_array = explode(", ", $category_name);
                                         $category_amount_array = explode(", ", $category_amount);
+                                        $v_nv_array = explode(", ", $v_nv);
                                         
                                         
                                         
                                         foreach($supplier_array as $key => $value){
                                           $category_name_str =  $category_name_array[$key];
                                             echo '<div class="row mb-2">';
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>Supplier Name</label>';
-                                            echo '<input type="text" name="update_supplier_name['.$key.']" class="form-control" value="' . $value . '" required>';
-                                            echo '</div>';
-                                            echo '<div class="col-md-5">';
-                                            echo '<label for="returned_cash">Address</label>';
-                                            echo '<input type="textarea" name="update_address['.$key.']" class="form-control" value="'. $address_array[$key] .'">';
+                                              echo '<div class="col-md-2">';
+                                                echo '<label>Transaction Date</label>';
+                                                echo '<input type="date" name="update_transaction_date['.$key.']" class="form-control" value="' . $transaction_date_array[$key] . '" required>';
+                                              echo '</div>';
+                                              echo '<div class="col-md-2">';
+                                                echo '<label>Supplier Name</label>';
+                                                echo '<input type="text" name="update_supplier_name['.$key.']" class="form-control" value="' . $value . '" required>';
+                                              echo '</div>';
+                                              echo '<div class="col-md-5">';
+                                                echo '<label for="returned_cash">Address</label>';
+                                                echo '<input type="textarea" name="update_address['.$key.']" class="form-control" value="'. $address_array[$key] .'">';
+                                              echo '</div>';
+                                              echo '<div class="col-md-3">';
+                                                echo '<label>TIN</label>';
+                                                echo '<input type="text" name="update_tin['.$key.']" value="'. $tin_array[$key] .'" class="form-control">';
+                                              echo '</div>';
                                             echo '</div>';
 
                                             // Start of first column
-                                            echo '<div class="col-md-3">';
-                                            echo '<label>Expense:</label>';
-                                            echo '<input type="text" name="old_category_name['.$key.']" class="form-control" value="'. $category_name_str .'" hidden>';
-                                            echo '<select name="update_category_name['.$key.']" class="form-select" required>';
+                                            echo '<div class="row mb-2">';
+                                              echo '<div class="col-md-3">';
+                                                echo '<label>Document Type</label>';
+                                                echo '<select name="update_doc_type['.$key.']" class="form-select" required>';
+                                                  echo '<option value="'. $doc_type_array[$key] .'" selected>'. $doc_type_array[$key] .'</option>';
+                                                  echo '<option value="OR">OR</option>';
+                                                  echo ' <option value="SI">SI</option>';
+                                                  echo '</select>';
+                                              echo '</div>';
+                                              echo '<div class="col-md-3">';
+                                                echo '<label>Doc Number</label>';
+                                                echo '<input type="text" name="update_doc_num['.$key.']" value="'. $doc_num_array[$key] .'" class="form-control">';
+                                              echo '</div>';  
+                                              echo '<div class="col-md-3">';
+                                                echo '<label>Expense:</label>';
+                                                echo '<input type="text" name="old_category_name['.$key.']" class="form-control" value="'. $category_name_str .'" hidden>';
+                                                echo '<select name="update_category_name['.$key.']" class="form-select" required>';
                                           
                                             $sql_category_str = "SELECT category_name FROM admin_categories WHERE category_change = '$category_name_str'";
                                             $result_category_str = mysqli_query($conn, $sql_category_str);
@@ -605,47 +664,38 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                                             while ($category_row1 = mysqli_fetch_assoc($result_category1)) {
                                                 $category_name1 = $category_row1['category_name'];
                                                 $category_name_replace1 = strtolower(str_replace([' - ', ', ', ' / ', '-', ',', '/', ' '], '_', $category_name1));
-
                                                 // Add selected option
                                                 echo "<option value=\"$category_name_replace1\">$category_name1</option>";
                                             }
-                                            echo '</select>';
-                                            echo '</div>'; 
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>Amount</label>';
-                                            echo '<input type="number" name="update_category_amount['.$key.']" class="form-control" value="' . $category_amount_array[$key] . '" required>';
+                                                echo '</select>';
+                                              echo '</div>'; 
+                                              echo '<div class="col-md-3">';
+                                                echo '<label>Amount</label>';
+                                                echo '<input type="number" name="update_category_amount['.$key.']" class="form-control" value="' . $category_amount_array[$key] . '" required>';
+                                              echo '</div>';
                                             echo '</div>';
-                                            echo '</div>';
-                                            echo '<div class="row mb-2">';
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>TIN</label>';
-                                            echo '<input type="text" name="update_tin['.$key.']" value="'. $tin_array[$key] .'" class="form-control" required>';
-                                            echo '</div>';
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>Document Type</label>';
-                                            echo '<select name="update_doc_type['.$key.']" class="form-select" required>';
-                                            echo '<option value="'. $doc_type_array[$key] .'" selected>'. $doc_type_array[$key] .'</option>';
-                                            echo '<option value="OR">OR</option>';
-                                            echo ' <option value="SI">SI</option>';
-                                            echo '</select>';
-                                            echo '</div>';
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>Doc Number</label>';
-                                            echo '<input type="text" name="update_doc_num['.$key.']" value="'. $doc_num_array[$key] .'" class="form-control">';
-                                            echo '</div>';     
-                                            echo '<div class="col-md-2">';
-                                            echo '<label>Goods/Service/Others</label>';
-                                            echo '<select name="update_goods_service_others['.$key.']" class="form-select" required>';
-                                            echo '<option value="'. $goods_service_others_array[$key] .'" selected>'. $goods_service_others_array[$key] .'</option>';
-                                            echo '<option value="Goods">Goods</option>';
-                                            echo '<option value="Service">Service</option>';
-                                            echo '<option value="Others">Others</option>';
-                                            echo '</select>';
-                                            echo '</div>';
-                                            echo '<div class="col-md-4">';
-                                            echo '<label>Particulars</label>';
-                                            echo '<input type="text" name="update_particular['.$key.']" value="'. $particulars_array[$key] .'" class="form-control">';
-                                            echo '</div>';
+                                            echo '<div class="row mb-2">';   
+                                              echo '<div class="col-md-2">';
+                                                  echo '<label>V/NV</label>';
+                                                  echo '<select name="update_v_nv['.$key.']" class="form-select" required>';
+                                                  echo '<option value="'. $v_nv[$key] .'" selected>'. $v_nv_array[$key] .'</option>';
+                                                  echo '<option value="V">V</option>';
+                                                  echo '<option value="NV">NV</option>';
+                                                  echo '</select>';
+                                              echo '</div>';
+                                              echo '<div class="col-md-2">';
+                                                echo '<label>Goods/Service/Others</label>';
+                                                echo '<select name="update_goods_service_others['.$key.']" class="form-select" required>';
+                                                echo '<option value="'. $goods_service_others_array[$key] .'" selected>'. $goods_service_others_array[$key] .'</option>';
+                                                echo '<option value="Goods">Goods</option>';
+                                                echo '<option value="Service">Service</option>';
+                                                echo '<option value="Others">Others</option>';
+                                                echo '</select>';
+                                              echo '</div>';
+                                              echo '<div class="col-md-8">';
+                                                echo '<label>Particulars</label>';
+                                                echo '<input type="text" name="update_particular['.$key.']" value="'. $particulars_array[$key] .'" class="form-control">';
+                                              echo '</div>';
                                             echo '</div>';
                                             echo '<hr><br>';
                                         }
@@ -653,12 +703,14 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                                 ?>
                             </div>
                               <div class="row mb-2">
-                                  <div class="col-md-4">
-                                      <button type="button" class="btn btn-secondary btn_add_expenses" data-record-id="<?php echo $row['record_id']; ?>">ADD EXPENSES</button>
+                                  <div class="col-md-2">
+                                      <button type="button" class="btn btn-success btn_add_expenses" data-record-id="<?php echo $row['record_id']; ?>">ADD EXPENSES</button>
                                   </div>
-                                  <div class="col-md-4">
-                                      <button type="button" class="btn btn-secondary btn_remove_expenses" data-record-id="<?php echo $row['record_id']; ?>">REMOVE PREVIOUS</button>
+                                  <div class="col-md-3">
+                                      <button type="button" class="btn btn-danger btn_remove_expenses" data-record-id="<?php echo $row['record_id']; ?>">REMOVE PREVIOUS</button>
                                   </div>
+                                  <div class="col-md-8">
+                                  </div>  
                               </div>
                       </div>
                   </div>
@@ -702,12 +754,34 @@ $(document).ready(function() {
         <br>
         <div class="row mb-2">
             <div class="col-md-2">
+                <label>Transaction Date</label>
+                <input type="date" name="update_transaction_date[]" class="form-control" required>
+            </div>
+            <div class="col-md-2">
                 <label>Supplier Name</label>
                 <input type="text" name="update_supplier_name[]" class="form-control" required>
             </div>
             <div class="col-md-5">
                 <label>Address</label>
-                <input type="textarea" name="update_address[]" class="form-control" required>
+                <input type="textarea" name="update_address[]" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>TIN</label>
+                <input type="text" name="update_tin[]" class="form-control">
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-3">
+                <label>Document Type</label>
+                <select name="update_doc_type[]" class="form-select" required>
+                    <option value="0" disabled selected>Select Document Type</option>
+                    <option value="OR">OR</option>
+                    <option value="SI">SI</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Doc Number</label>
+                <input type="text" name="update_doc_num[]" class="form-control">
             </div>
             <div class="col-md-3">
                 <label>Expense:</label>
@@ -724,27 +798,20 @@ $(document).ready(function() {
                     ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label>Amount</label>
                 <input type="number" name="update_category_amount[]" class="form-control" required>
             </div>
         </div>
+
         <div class="row mb-2">
             <div class="col-md-2">
-                <label>TIN</label>
-                <input type="text" name="update_tin[]" class="form-control" required>
-            </div>
-            <div class="col-md-2">
-                <label>Document Type</label>
-                <select name="update_doc_type[]" class="form-select" required>
-                    <option value="0" disabled selected>Select Document Type</option>
-                    <option value="OR">OR</option>
-                    <option value="SI">SI</option>
+                <label>V/NV</label>
+                <select name="update_v_nv[]" class="form-select" required>
+                    <option value="0" disabled selected>Please Select</option>
+                    <option value="V">V</option>
+                    <option value="NV">NV</option>
                 </select>
-            </div>
-            <div class="col-md-2">
-                <label>Doc Number</label>
-                <input type="text" name="update_doc_num[]" class="form-control">
             </div>
             <div class="col-md-2">
                 <label>Goods/Service/Others</label>
@@ -755,7 +822,7 @@ $(document).ready(function() {
                     <option value="Others">Others</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-8">
                 <label>Particulars</label>
                 <input type="text" name="update_particular[]" class="form-control">
             </div>
@@ -818,28 +885,23 @@ $(document).ready(function() {
   <script src="../../assets/js/app.min.js"></script>
 
   <script>
-  //     setTimeout(function() {
-  //   // Clear the console after 1 second
-  //   console.clear();
-  // }, 100);
-
   const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get('id');
+  const modalId = urlParams.get('modal-update'); // Change 'id' to 'modal-update'
 
-  if (id) {
+  if (modalId) {
       // Output debug information
-      console.log(`Showing modal for ID: ${id}`);
+      console.log(`Showing modal for ID: ${modalId}`);
       
-      // Use JavaScript to trigger the modal based on the 'id'
+      // Use JavaScript to trigger the modal based on the 'modal-update'
       $(document).ready(function() {
-          $(`#update-modal-${id}`).modal('show');
+          $(`#update-modal-${modalId}`).modal('show');
       });
   }
 
   window.onload = function() {
       history.replaceState({}, document.title, window.location.pathname);
   }
-  </script> 
+</script>
 
   </body>
   </html>

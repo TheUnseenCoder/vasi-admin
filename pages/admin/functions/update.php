@@ -4,6 +4,7 @@ include '../../../conn.php';
 date_default_timezone_set('Asia/Manila');
 ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 
+
 if (isset($_POST["update_employee"])) {
     $employee_id = $_POST['employee_id'];
     $employee_name = $_POST['employee_name'];
@@ -71,13 +72,15 @@ elseif (isset($_POST["update_record"])) {
     $returned_cash = $_POST['returned_cash'];
 
     // Prepare arrays for expenses data
+    $transaction_date = $_POST['update_transaction_date'];
+    $v_nv = $_POST['update_v_nv'];
     $update_supplier_name = $_POST['update_supplier_name'];
-    $update_address = $_POST['update_address'];
+    $update_address = isset($_POST['update_address']) ? $_POST['update_address'] : "No Address";
     $update_category_name = $_POST['update_category_name'];
     $update_category_amount = $_POST['update_category_amount'];
-    $update_tin = $_POST['update_tin'];
+    $update_tin = isset($_POST['update_tin']) ? $_POST['update_tin'] : "No TIN";
     $update_doc_type = $_POST['update_doc_type'];
-    $update_doc_num = $_POST['update_doc_num'];
+    $update_doc_num =  isset($_POST['update_doc_num']) ? $_POST['update_doc_num'] : "No Doc Num";
     $update_goods_service_others = $_POST['update_goods_service_others'];
     $update_particular = $_POST['update_particular'];
     $old_category_name = $_POST['old_category_name'];
@@ -109,6 +112,35 @@ elseif (isset($_POST["update_record"])) {
         $doc_nums_str = implode(", ", $update_doc_num);
         $goods_service_others_str = implode(", ", $update_goods_service_others);
         $particulars_str = implode(", ", $update_particular);
+        $transaction_date_str = implode(", ", $transaction_date);
+        $v_nv_str = implode(", ", $v_nv);
+       
+        // Determine company types for each category name
+        $company_types = [];
+        foreach ($update_supplier_name as $name) {
+            $company_type = "";
+            $name_lower = strtolower($name);
+            if (
+                strpos($name_lower, "corp") !== false || 
+                strpos($name_lower, "inc") !== false || 
+                strpos($name_lower, "corporation") !== false || 
+                strpos($name_lower, "company") !== false || 
+                strpos($name_lower, "incorporated") !== false
+            ) {
+                $company_type = "Corporation";
+            } elseif (
+                substr($name_lower, -2) === "co" || 
+                substr($name_lower, -3) === "co." || 
+                substr($name_lower, -3) === "ltd" || 
+                substr($name_lower, -5) === "hotel"
+            ) {
+                $company_type = "Corporation";
+            } else {
+                $company_type = "Individual";
+            }
+            $company_types[] = $company_type;
+        }
+        $company_types_str = implode(", ", $company_types);
 
 
         // Construct the SQL query for updating the main record
@@ -124,7 +156,7 @@ elseif (isset($_POST["update_record"])) {
         // Execute the main record update query
         if (mysqli_query($conn, $sqlMainRecord)) {
             // Construct the SQL query for updating expenses details
-            $sqlUpdateExpense = "UPDATE admin_record_details SET category_names = '$category_name', category_amounts = '$category_amount', supplier_name = '$supplier_names_str', address = '$addresses_str', tin = '$tins_str', doc_type = '$doc_types_str', doc_num = '$doc_nums_str', goods_service_others = '$goods_service_others_str', particulars = '$particulars_str' WHERE record_id = '$id'";
+            $sqlUpdateExpense = "UPDATE admin_record_details SET transaction_date = '$transaction_date_str', category_names = '$category_name', category_amounts = '$category_amount', supplier_name = '$supplier_names_str', address = '$addresses_str', tin = '$tins_str', doc_type = '$doc_types_str', doc_num = '$doc_nums_str', goods_service_others = '$goods_service_others_str', particulars = '$particulars_str', company_types = '$company_types_str', v_nv = '$v_nv_str' WHERE record_id = '$id'";
             // Execute the expenses details update query
             if (mysqli_query($conn, $sqlUpdateExpense)) {
                 $response = array("success" => true, "message" => "Record updated successfully.");
@@ -140,7 +172,7 @@ elseif (isset($_POST["update_record"])) {
     }
 
     // Redirect to the appropriate page
-    header('Location: ../sample.php?modal-update=' . $id);
+    header('Location: ../recents.php?modal-update=' . $id);
     exit();
 }
 

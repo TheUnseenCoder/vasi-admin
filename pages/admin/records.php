@@ -17,7 +17,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
 
   <?php include 'components/icon.php'; ?>
   
-  <title><?php echo $title; ?> | Monthly Records</title>
+  <title><?php echo $title; ?> | Records</title>
 
   
   <!-- Main Template -->
@@ -37,12 +37,16 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
       <div class="container-fluid">
         <div class="card w-100">
           <div class="card-body p-4">
-            <h5 class="card-title fw-semibold mb-4"> Monthly Records</h5>
+            <h5 class="card-title fw-semibold mb-4"> Records List</h5>
             <div class="d-flex justify-content-end">
-              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+              <button type="button" class="btn btn-success btn-sm" style="margin-right: 20px;" data-bs-toggle="modal" data-bs-target="#ExpenseSummary">
                 <i class="ti ti-file-export fs-6"></i>
-                 Export Excel
-              </button>          
+                 Export Expense Summary
+              </button>     
+              <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#MonthlyReport">
+                <i class="ti ti-file-export fs-6"></i>
+                 Export Montly Report
+              </button>
             </div>
 
             <div class="mb-3">
@@ -81,9 +85,7 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
                 </thead>
                 <tbody>
                 <?php
-                    $current_month = date('m');
-                    $current_year = date('Y');
-                    $sql = "SELECT * FROM admin_records WHERE MONTH(date_encoded) = '$current_month' AND YEAR(date_encoded) = '$current_year' ORDER BY date_encoded DESC";
+                    $sql = "SELECT * FROM admin_records ORDER BY date_encoded DESC";
                     if($rs=$conn->query($sql)){
                         $i = 1;
                         while ($row=$rs->fetch_assoc()) {
@@ -115,13 +117,46 @@ if(isset($_SESSION["loggedinasadmin"]) || isset($_SESSION["loggedinasmainuser"])
       </div>
   </div>
 </div>
-
 <!-- DATE MODAL -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="ExpenseSummary" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ExpenseSummaryLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Export Excel</h1>
+        <h1 class="modal-title fs-5" id="ExpenseSummaryLabel">Export Expense Summary</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2">
+          <div class="col-md">
+            <form action="functions/download_expense.php" method="post">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="from_date">From:</label>
+                        <input type="date" name="from_date" class="form-control" id="from_date" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="to_date">To:</label>
+                        <input type="date" name="to_date" class="form-control" id ="to_date" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ti ti-x fs-3"></i> Close</button>
+        <button type="submit" class="btn btn-primary" name="download_expense"><i class="ti ti-device-floppy fs-3"></i> Save</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DATE MODAL -->
+<div class="modal fade" id="MonthlyReport" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="MonthlyReportLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="MonthlyReportLabel">Export Monthly Report</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
